@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+  mongodb:
+    image: mongo
+    restart: always
+    environment:
+      - MONGO_INITDB_DATABASE=lermo   # Replace with your desired database name
+      - MONGO_INITDB_ROOT_USERNAME=root  # Replace with your desired username
+      - MONGO_INITDB_ROOT_PASSWORD=123456789  # Replace with your desired password
+    volumes:
+      - ./mongodb:/data/db
+    ports:
+      - 27017:27017   # Expose MongoDB port
+    networks:
+      - appnetwork
+
+  minio:
+    image: quay.io/minio/minio
+    restart: always
+    ports:
+      - 9000:9000
+      - 9090:9090
+    volumes:
+      - ./minio/data:/data
+    environment:
+      - MINIO_ROOT_USER=root
+      - MINIO_ROOT_PASSWORD=123456789
+      - MINIO_ACCESS_KEY=RFmz74gjUvMsxhuC0Lfb
+      - MINIO_SECRET_KEY=7D5o2POIlA3EsYATQmcScYZ9Udd2hejrxfGW44uz
+    command: server /data --console-address ":9090" --address ":9000" --config-dir /data/.minio
+    networks:
+      - appnetwork
+
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 10;
+      /usr/bin/mc config host add minio http://minio:9000 root 123456789;
+      /usr/bin/mc mb minio/lermo;
+      # /usr/bin/mc policy set public minio/typebot;
+      exit 0;
+      "
+    networks:
+      - appnetwork
+
+networks:
+  appnetwork: 
+    driver: bridge
+    
+volumes:
+  mongodb_data:
+  minio_data:
