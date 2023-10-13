@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose/dist/common/mongoose.decorators';
 import { Model } from 'mongoose';
-import { IUserModel, IUser } from '../../interfaces/user.interface';
+import { IUserModel, IUser } from '@interfaces/user.interface';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 
-import { UserEntity } from 'src/entity/user.entity'
+import { UserEntity } from '@entities/user.entity';
 
 @Injectable()
 export class UserService {

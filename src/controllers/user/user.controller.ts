@@ -43,7 +43,7 @@ import {
 import { TYPES } from 'src/common/types';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
-import { UserEntity, UserProfileEntity } from 'src/entity/user.entity';
+import { UserEntity, UserProfileEntity } from 'src/entities/user.entity';
 
 import { UserService } from 'src/services/user/user.service';
 import { VideoService } from 'src/services/video/video.service';
@@ -71,8 +71,8 @@ export class UserController {
     private readonly followService: FollowService,
     private readonly authService: AuthService,
     private readonly notificationService: NotificationService,
-    @Inject(TYPES.IStorageService)
-    private readonly storageService: IStorageService,
+    // @Inject(TYPES.IStorageService)
+    // private readonly storageService: IStorageService,
   ) { }
 
   @Get('/')
@@ -106,16 +106,16 @@ export class UserController {
       );
     }
 
-    const avatarUrl = await this.storageService.getPresignedUrl(user.avatar, 60 * 60 * 24)
-    const bannerUrl = await this.storageService.getPresignedUrl(user.banner, 60 * 60 * 24)
+    // const avatarUrl = await this.storageService.getPresignedUrl(user.avatar, 60 * 60 * 24)
+    // const bannerUrl = await this.storageService.getPresignedUrl(user.banner, 60 * 60 * 24)
 
-    const data = {
-      ...user.toJSON(),
-      avatar: avatarUrl,
-      banner: bannerUrl
-    }
+    // const data = {
+    //   ...user.toJSON(),
+    //   avatar: avatarUrl,
+    //   banner: bannerUrl
+    // }
 
-    return new UserEntity(data);
+    // return new UserEntity(data);
   }
 
   @Get('/profile')
@@ -124,27 +124,27 @@ export class UserController {
     const { user } = req;
     const { _id } = user;
 
-    try {
-      const user = await this.userService.findById(_id)
-      const avatarUrl = await this.storageService.getPresignedUrl(user.avatar, 60 * 60 * 24)
-      const bannerUrl = await this.storageService.getPresignedUrl(user.banner, 60 * 60 * 24)
-      const data = {
-        ...user.toJSON(),
-        avatar: avatarUrl,
-        banner: bannerUrl
-      }
+    // try {
+    //   const user = await this.userService.findById(_id)
+    //   const avatarUrl = await this.storageService.getPresignedUrl(user.avatar, 60 * 60 * 24)
+    //   const bannerUrl = await this.storageService.getPresignedUrl(user.banner, 60 * 60 * 24)
+    //   const data = {
+    //     ...user.toJSON(),
+    //     avatar: avatarUrl,
+    //     banner: bannerUrl
+    //   }
 
-      return new UserProfileEntity(data)
-    } catch (error) {
-      console.error(error);
-      throw new HttpException(
-        {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          message: 'Something went wrong',
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    //   return new UserProfileEntity(data)
+    // } catch (error) {
+    //   console.error(error);
+    //   throw new HttpException(
+    //     {
+    //       status: HttpStatus.INTERNAL_SERVER_ERROR,
+    //       message: 'Something went wrong',
+    //     },
+    //     HttpStatus.INTERNAL_SERVER_ERROR,
+    //   );
+    // }
   }
 
   @Get('/follow/:id')
@@ -356,24 +356,24 @@ export class UserController {
     @Request() req: any,
     @UploadedFile() file,
   ): Promise<any> {
-    const { buffer } = file;
-    const { user } = req;
-    const { _id } = user;
+    // const { buffer } = file;
+    // const { user } = req;
+    // const { _id } = user;
 
-    const fileName = `${_id}.png`;
-    const path = `${this.storageService.getLocationPath(UploadKey.AVATAR)}/${fileName}`;
+    // const fileName = `${_id}.png`;
+    // const path = `${this.storageService.getLocationPath(UploadKey.AVATAR)}/${fileName}`;
 
-    try {
-      const res = await this.storageService.uploadImage(buffer, path)
-      await this.userService.updateAvatar(_id, path);
-      return res
-    } catch (error) {
-      console.log(error)
-      throw new HttpException({
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: 'Opps!!',
-      }, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    // try {
+    //   const res = await this.storageService.uploadImage(buffer, path)
+    //   await this.userService.updateAvatar(_id, path);
+    //   return res
+    // } catch (error) {
+    //   console.log(error)
+    //   throw new HttpException({
+    //     status: HttpStatus.INTERNAL_SERVER_ERROR,
+    //     message: 'Opps!!',
+    //   }, HttpStatus.INTERNAL_SERVER_ERROR);
+    // }
   }
 
   @Patch('/profile/banner')
@@ -388,24 +388,24 @@ export class UserController {
     @Request() req: any,
     @UploadedFile() file,
   ): Promise<any> {
-    const { buffer } = file;
-    const { user } = req;
-    const { _id } = user;
+    // const { buffer } = file;
+    // const { user } = req;
+    // const { _id } = user;
 
-    const fileName = `${_id}.png`;
-    const path = `${this.storageService.getLocationPath(UploadKey.BANNER)}/${fileName}`;
+    // const fileName = `${_id}.png`;
+    // const path = `${this.storageService.getLocationPath(UploadKey.BANNER)}/${fileName}`;
 
-    try {
-      const res = await this.storageService.uploadImage(buffer, path)
-      await this.userService.updateBanner(_id, path);
-      return res
-    } catch (error) {
-      console.log(error)
-      throw new HttpException({
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: 'Opps!!',
-      }, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    // try {
+    //   const res = await this.storageService.uploadImage(buffer, path)
+    //   await this.userService.updateBanner(_id, path);
+    //   return res
+    // } catch (error) {
+    //   console.log(error)
+    //   throw new HttpException({
+    //     status: HttpStatus.INTERNAL_SERVER_ERROR,
+    //     message: 'Opps!!',
+    //   }, HttpStatus.INTERNAL_SERVER_ERROR);
+    // }
   }
 
   @Post('unfollow')
@@ -462,32 +462,32 @@ export class UserController {
   private async uploadAvatarImg(
     buffer: Buffer,
     fileName: string,
-  ): Promise<string> {
-    const path = `${this.storageService.getLocationPath(
-      UploadKey.AVATAR,
-    )}/${fileName}`;
+  ): Promise<any> {
+    // const path = `${this.storageService.getLocationPath(
+    //   UploadKey.AVATAR,
+    // )}/${fileName}`;
 
-    const resUpload = await this.storageService.uploadFile(
-      buffer,
-      path,
-      'public-read',
-    );
-    return resUpload.Key;
+    // const resUpload = await this.storageService.uploadFile(
+    //   buffer,
+    //   path,
+    //   'public-read',
+    // );
+    // return resUpload.Key;
   }
 
   private async uploadBannerImg(
     buffer: Buffer,
     fileName: string,
-  ): Promise<string> {
-    const path = `${this.storageService.getLocationPath(
-      UploadKey.BANNER,
-    )}/${fileName}`;
+  ): Promise<any> {
+    // const path = `${this.storageService.getLocationPath(
+    //   UploadKey.BANNER,
+    // )}/${fileName}`;
 
-    const resUpload = await this.storageService.uploadFile(
-      buffer,
-      path,
-      'public-read',
-    );
-    return resUpload.Key;
+    // const resUpload = await this.storageService.uploadFile(
+    //   buffer,
+    //   path,
+    //   'public-read',
+    // );
+    // return resUpload.Key;
   }
 }
