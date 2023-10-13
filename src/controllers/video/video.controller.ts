@@ -48,8 +48,8 @@ import { UserService } from 'src/services/user/user.service';
 import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
 import { ValidationPipe } from '@nestjs/common';
 
-import { VideoEntity, VideoKeyEntity } from 'src/entity/video.entity'
-import { CommentEntity } from 'src/entity/comment.entity'
+import { VideoEntity, VideoKeyEntity } from 'src/entities/video.entity'
+import { CommentEntity } from 'src/entities/comment.entity'
 import { IVideoModel } from 'src/interfaces/video.interface'
 import crypto from 'crypto'
 
@@ -65,9 +65,8 @@ export class VideoController {
     private readonly userService: UserService,
     private readonly videoService: VideoService,
     private readonly commentService: CommentService,
-    @Inject(TYPES.IStorageService)
-    private readonly storageService: IStorageService,
-    private readonly httpService: HttpService,
+    // @Inject(TYPES.IStorageService)
+    // private readonly storageService: IStorageService,
     private readonly notificationService: NotificationService
   ) { }
 
@@ -92,13 +91,13 @@ export class VideoController {
       videos.map(async (video) => {
         const user = await this.userService.findById(`${video.userId}`)
         const videoJSON = video.toJSON()
-        const avatarUrl = await this.storageService.getPresignedUrl(user.avatar, 60 * 60 * 24)
-        const thumbnailUrl = await this.storageService.getPresignedUrl(videoJSON.thumbnail, 60 * 60 * 24)
+        // const avatarUrl = await this.storageService.getPresignedUrl(user.avatar, 60 * 60 * 24)
+        // const thumbnailUrl = await this.storageService.getPresignedUrl(videoJSON.thumbnail, 60 * 60 * 24)
         const data = {
           ...videoJSON,
           username: user.username,
-          thumbnail: thumbnailUrl,
-          avatar: avatarUrl,
+          thumbnail: '',
+          avatar: '',
           about: user.about
         }
 
@@ -118,17 +117,17 @@ export class VideoController {
     const user = await this.userService.findById(`${video.userId}`)
     const videoJSON = video.toJSON()
 
-    const videoUrl = await this.storageService.getPresignedUrl(videoJSON.videoPath, 60 * 60 * 2)
-    const avatarUrl = await this.storageService.getPresignedUrl(user.avatar, 60 * 60 * 2)
-    const thumbnailUrl = await this.storageService.getPresignedUrl(videoJSON.thumbnail, 60 * 60 * 24)
+    // const videoUrl = await this.storageService.getPresignedUrl(videoJSON.videoPath, 60 * 60 * 2)
+    // const avatarUrl = await this.storageService.getPresignedUrl(user.avatar, 60 * 60 * 2)
+    // const thumbnailUrl = await this.storageService.getPresignedUrl(videoJSON.thumbnail, 60 * 60 * 24)
 
     const data = {
       ...videoJSON,
       username: user.username,
-      avatar: avatarUrl,
-      thumbnail: thumbnailUrl,
+      avatar: '',
+      thumbnail: '',
       about: user.about,
-      videoUrl: videoUrl
+      videoUrl: ''
     }
 
     return new VideoEntity(data)
@@ -272,42 +271,42 @@ export class VideoController {
     @Request() req,
     @Headers() auth
   ): Promise<any> {
-    const userIDFromToken = req.user ? req.user._id : ""
-    const { id } = params;
-    const { buffer } = file;
+    // const userIDFromToken = req.user ? req.user._id : ""
+    // const { id } = params;
+    // const { buffer } = file;
 
-    const fileName = `${id}${file.originalname.replace(/.*(\.[^.]+)$/, '$1')}`
-    const filePath = `${this.storageService.getLocationPath(UploadKey.VIDEO_SOURCE)}/${fileName.replace(/\s/g, '-')}`;
+    // const fileName = `${id}${file.originalname.replace(/.*(\.[^.]+)$/, '$1')}`
+    // const filePath = `${this.storageService.getLocationPath(UploadKey.VIDEO_SOURCE)}/${fileName.replace(/\s/g, '-')}`;
 
-    const data = {
-      videoName: file.originalname,
-      videoPath: filePath,
-    }
+    // const data = {
+    //   videoName: file.originalname,
+    //   videoPath: filePath,
+    // }
 
-    const video = await this.videoService.findOne(id);
-    if (!video) {
-      const msgNotFound = 'Not found video.';
-      throw new NotFoundException({ id }, msgNotFound);
-    }
+    // const video = await this.videoService.findOne(id);
+    // if (!video) {
+    //   const msgNotFound = 'Not found video.';
+    //   throw new NotFoundException({ id }, msgNotFound);
+    // }
 
-    try {
-      if (userIDFromToken === video.userId) {
-        const resUpload = await this.storageService.uploadFile(buffer, filePath)
-        await this.videoService.updateVideo(video._id, data)
-        return resUpload
-      } else {
-        throw new HttpException({
-          status: HttpStatus.UNAUTHORIZED,
-          message: 'Your permission is denied',
-        }, HttpStatus.UNAUTHORIZED);
-      }
-    } catch (error) {
-      console.log(error)
-      throw new HttpException({
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: 'Opps!!',
-      }, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    // try {
+    //   if (userIDFromToken === video.userId) {
+    //     const resUpload = await this.storageService.uploadFile(buffer, filePath)
+    //     await this.videoService.updateVideo(video._id, data)
+    //     return resUpload
+    //   } else {
+    //     throw new HttpException({
+    //       status: HttpStatus.UNAUTHORIZED,
+    //       message: 'Your permission is denied',
+    //     }, HttpStatus.UNAUTHORIZED);
+    //   }
+    // } catch (error) {
+    //   console.log(error)
+    //   throw new HttpException({
+    //     status: HttpStatus.INTERNAL_SERVER_ERROR,
+    //     message: 'Opps!!',
+    //   }, HttpStatus.INTERNAL_SERVER_ERROR);
+    // }
   }
 
   @Patch('/:id/thumbnail')
@@ -322,28 +321,28 @@ export class VideoController {
     @Param() params,
     @UploadedFile() file,
   ): Promise<any> {
-    const { id } = params;
-    const { buffer } = file;
-    const video = await this.videoService.findOne(id);
-    if (!video) {
-      const msgNotFound = 'Not found video.';
-      throw new NotFoundException({ id }, msgNotFound);
-    }
+    // const { id } = params;
+    // const { buffer } = file;
+    // const video = await this.videoService.findOne(id);
+    // if (!video) {
+    //   const msgNotFound = 'Not found video.';
+    //   throw new NotFoundException({ id }, msgNotFound);
+    // }
 
-    try {
-      const fileName = `${id}.png`;
-      const filePath = `${this.storageService.getLocationPath(UploadKey.VIDEO_THUMBNAIL,)}/${fileName}`;
-      await this.storageService.uploadImage(buffer, filePath);
+    // try {
+    //   const fileName = `${id}.png`;
+    //   const filePath = `${this.storageService.getLocationPath(UploadKey.VIDEO_THUMBNAIL,)}/${fileName}`;
+    //   await this.storageService.uploadImage(buffer, filePath);
 
-      const resUpdate = await this.videoService.updateThumbnail(id, filePath);
-      return {
-        id,
-        message: 'Update thumbnail ssuccess',
-      };
-    } catch (error) {
-      console.log(error)
-      throw new NotFoundException({ id }, 'Opps');
-    }
+    //   const resUpdate = await this.videoService.updateThumbnail(id, filePath);
+    //   return {
+    //     id,
+    //     message: 'Update thumbnail ssuccess',
+    //   };
+    // } catch (error) {
+    //   console.log(error)
+    //   throw new NotFoundException({ id }, 'Opps');
+    // }
   }
 
   @Patch('/:id/view')
@@ -365,33 +364,33 @@ export class VideoController {
   @Get('/:videoId/comments')
   @ApiParam({ name: 'videoId', type: String })
   async fetchCommentAll(@Param() params): Promise<any> {
-    const { videoId } = params;
+    // const { videoId } = params;
 
-    const comments = await this.commentService.findAll(videoId);
-    if (!comments) {
-      throw new NotFoundException({ videoId }, 'Not found comments');
-    }
+    // const comments = await this.commentService.findAll(videoId);
+    // if (!comments) {
+    //   throw new NotFoundException({ videoId }, 'Not found comments');
+    // }
 
-    const res = await Promise.all(
-      comments.map(async (comment) => {
-        const user = await this.userService.findById(`${comment.userId}`)
-        const avatarUrl = await this.storageService.getPresignedUrl(user.avatar, 60 * 60 * 2)
+    // const res = await Promise.all(
+    //   comments.map(async (comment) => {
+    //     const user = await this.userService.findById(`${comment.userId}`)
+    //     const avatarUrl = await this.storageService.getPresignedUrl(user.avatar, 60 * 60 * 2)
 
-        const data = {
-          username: user.username,
-          avatar: avatarUrl,
-          message: comment.message,
-          createdAt: comment.createdAt
-        }
+    //     const data = {
+    //       username: user.username,
+    //       avatar: avatarUrl,
+    //       message: comment.message,
+    //       createdAt: comment.createdAt
+    //     }
 
-        return new CommentEntity(data)
-      }),
-    );
+    //     return new CommentEntity(data)
+    //   }),
+    // );
 
-    return {
-      id: videoId,
-      comments: res,
-    };
+    // return {
+    //   id: videoId,
+    //   comments: res,
+    // };
   }
 
   @Post('/:videoId/comments')

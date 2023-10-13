@@ -4,7 +4,7 @@ import { createMock } from '@golevelup/nestjs-testing';
 import { Model, Query } from 'mongoose';
 
 import { UserService } from './user.service';
-import { IUserModel, IUser } from '../../interfaces/user.interface';
+import { IUserModel, IUser } from '../.@interfaces/user.interface';
 
 const usersMock = [
   {_id: "123"}

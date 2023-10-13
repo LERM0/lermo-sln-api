@@ -13,6 +13,15 @@
     "incremental": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
+    "paths": {
+      "@common/*": ["./src/common/*"],
+      "@config/*": ["./src/config/*"],
+      "@controllers/*": ["./src/controllers/*"],
+      "@services/*": ["./src/services/*"],
+      "@entities/*": ["./src/entities/*"],
+      "@interfaces/*": ["./src/interfaces/*"]
+    }
   },
-  "exclude": ["./node_modules", "./dist"]
+  "exclude": ["./node_modules", "./dist"],
+  
 }

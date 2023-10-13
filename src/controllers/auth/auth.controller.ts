@@ -14,11 +14,11 @@ import {
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { nanoid } from 'nanoid/non-secure';
 
-import { SignInDTO } from 'src/common/validators';
-import { AuthService } from '../../services/auth/auth.service';
-import { FacebookAuthGuard } from '../../common/guards/facebook-auth.guard';
-import { UserService } from 'src/services/user/user.service';
-import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
+import { SignInDTO } from '@common/validators';
+import { AuthService } from '@services/auth/auth.service';
+import { FacebookAuthGuard } from '@common/guards/facebook-auth.guard';
+import { UserService } from '@services/user/user.service';
+import { ResponseInterceptor } from '@common/interceptors/response.interceptor';
 
 const WEB_URL = process.env.WEB_URL || 'http://localhost:3000';
 

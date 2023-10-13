@@ -40,7 +40,7 @@ import { UserService } from 'src/services/user/user.service';
 import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
 import { ValidationPipe } from '@nestjs/common';
 
-import { VideoEntity } from 'src/entity/video.entity'
+import { VideoEntity } from 'src/entities/video.entity'
 
 @Controller('feeds')
 @UseInterceptors(ResponseInterceptor)
@@ -50,8 +50,8 @@ export class FeedController {
     private readonly userService: UserService,
     private readonly videoService: VideoService,
     private readonly commentService: CommentService,
-    @Inject(TYPES.IStorageService)
-    private readonly storageService: IStorageService,
+    // @Inject(TYPES.IStorageService)
+    // private readonly storageService: IStorageService,
     private readonly httpService: HttpService,
   ) {}
 
@@ -76,15 +76,15 @@ export class FeedController {
       videos.map(async (video) => {
         const user = await this.userService.findById(`${video.userId}`)
         const videoJSON = video.toJSON()
-        const videoUrl = await this.storageService.getPresignedUrl(videoJSON.videoPath, 60 * 60 * 2)
-        const avatarUrl = await this.storageService.getPresignedUrl(user.avatar, 60 * 60 * 24)
-        const thumbnailUrl = await this.storageService.getPresignedUrl(videoJSON.thumbnail, 60 * 60 * 24)
+        // const videoUrl = await this.storageService.getPresignedUrl(videoJSON.videoPath, 60 * 60 * 2)
+        // const avatarUrl = await this.storageService.getPresignedUrl(user.avatar, 60 * 60 * 24)
+        // const thumbnailUrl = await this.storageService.getPresignedUrl(videoJSON.thumbnail, 60 * 60 * 24)
         const data = {
           ...videoJSON,
-          thumbnail: thumbnailUrl,
+          thumbnail: '',
           username: user.username,
-          avatar: avatarUrl,
-          videoUrl: videoUrl
+          avatar: '',
+          videoUrl: ''
         }
 
         return new VideoEntity(data)
@@ -115,15 +115,15 @@ export class FeedController {
       videos.map(async (video) => {
         const user = await this.userService.findById(`${video.userId}`)
         const videoJSON = video.toJSON()
-        const videoUrl = await this.storageService.getPresignedUrl(videoJSON.videoPath, 60 * 60 * 2)
-        const avatarUrl = await this.storageService.getPresignedUrl(user.avatar, 60 * 60 * 24)
-        const thumbnailUrl = await this.storageService.getPresignedUrl(videoJSON.thumbnail, 60 * 60 * 24)
+        // const videoUrl = await this.storageService.getPresignedUrl(videoJSON.videoPath, 60 * 60 * 2)
+        // const avatarUrl = await this.storageService.getPresignedUrl(user.avatar, 60 * 60 * 24)
+        // const thumbnailUrl = await this.storageService.getPresignedUrl(videoJSON.thumbnail, 60 * 60 * 24)
         const data = {
           ...videoJSON,
-          thumbnail: thumbnailUrl,
+          thumbnail: '',
           username: user.username,
-          avatar: avatarUrl,
-          videoUrl: videoUrl
+          avatar: '',
+          videoUrl: ''
         }
 
         return new VideoEntity(data)
