@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ElasticsearchModule } from '@nestjs/elasticsearch'
 
@@ -30,27 +30,37 @@ import { NotificationService } from '@services/notification/notification.service
 import { NotificationController } from '@controllers/notification/notification.controller';
 import configuration from '@config/configuration';
 import databaseConfig from '@config/database.config';
+import jwtConfig from '@config/jwt.config';
 
-// const JWT_PRIVATE_KEY = Buffer.from(process.env.JWT_PRIVATE_KEY, 'base64').toString('ascii')
-// const JWT_PUBLIC_KEY = Buffer.from(process.env.JWT_PUBLIC_KEY, 'base64').toString('ascii')
-const JWT_PASSPHRASE = process.env.JWT_PASSPHRASE || 'lermo'
-const JWT_ISSUER = process.env.JWT_ISSUER || 'lermo'
-const JWT_EXPIRESIN = process.env.JWT_EXPIRESIN || '30d'
-
-const DATABASE_CONNECTION = process.env.DATABASE_CONNECTION || "mongodb://localhost:27017/lermo"
 const ELASTICSEARCH_CONNECTION = process.env.ELASTICSEARCH_CONNECTION || "http://localhost:9200"
-
 
 @Module({
   imports: [
     HttpModule,
-    ConfigModule.forRoot({ load: [configuration] }),
+    ConfigModule.forRoot({ load: [configuration, jwtConfig] }),
     MongooseModule.forRootAsync({ 
       imports: [ConfigModule.forRoot({ load: [databaseConfig] })],
       useFactory: async (configService: ConfigService) => {
         return {
-          uri: configService.get<string>('db.url')
+          uri: configService.get('db.url'),
+          dbName: 'lermo'
         }
+      },
+      inject: [ConfigService],
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule.forRoot({ load: [jwtConfig] })],
+      useFactory: async (configService: ConfigService) => {
+        const options: JwtModuleOptions = {
+          privateKey: configService.get('jwt.privateKey'),
+          publicKey: configService.get('jwt.publicKey'),
+          signOptions: {
+            expiresIn: configService.get('jwt.expiresIn'),
+            issuer: configService.get('jwt.issuer'),
+            algorithm: 'RS256',
+          },
+        };
+        return options;
       },
       inject: [ConfigService],
     }),
@@ -58,11 +68,6 @@ const ELASTICSEARCH_CONNECTION = process.env.ELASTICSEARCH_CONNECTION || "http:/
       node: ELASTICSEARCH_CONNECTION,
     }),
     PassportModule,
-    JwtModule.register({
-      publicKey: '',
-      privateKey: { key: '', passphrase: JWT_PASSPHRASE },
-      signOptions: { algorithm: "RS256", expiresIn: JWT_EXPIRESIN, issuer: JWT_ISSUER, },
-    }),
     MongooseModule.forFeature([{ name: 'user', schema: UserSchema, collection: "users" }]),
     MongooseModule.forFeature([{ name: 'video', schema: VideoSchema, collection: "videos" }]),
     MongooseModule.forFeature([{ name: 'comment', schema: CommentSchema, collection: "comments" }]),
@@ -83,8 +88,4 @@ const ELASTICSEARCH_CONNECTION = process.env.ELASTICSEARCH_CONNECTION || "http:/
     NotificationService,
   ],
 })
-export class AppModule {
-  constructor(private configService: ConfigService) {
-    // console.log('app module - ', this.configService.get('db'))
-  }
-}
+export class AppModule {}

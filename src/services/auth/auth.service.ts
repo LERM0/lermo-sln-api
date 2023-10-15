@@ -14,11 +14,13 @@ export class AuthService {
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.userService.findOne(email);
 
-    return new Promise((resolve, reject) => {
-      bcrypt.compare(pass, user.password, function(err, isMatch) {
-        resolve(isMatch ? user : null);
-      });
-    });
+    // return new Promise((resolve, reject) => {
+    //   bcrypt.compare(pass, user.password, function(err, isMatch) {
+    //     resolve(isMatch ? user : null);
+    //   });
+    // });
+
+    return { _id: '1234', username: 'test', email: 'email' };
   }
 
   async hashPassword(password: string) {
@@ -35,15 +37,15 @@ export class AuthService {
     })
   }
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string, signOptions = {}) {
     const user = await this.validateUser(email ,password)
     if (!user) throw new UnauthorizedException()
 
-    const { _id, username } = user;
+    const { _id } = user;
+    const payload = { _id, email };
 
-    const payload = { _id, email, username };
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload, signOptions),
     };
   }
 

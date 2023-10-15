@@ -118,34 +118,34 @@ export class UserController {
     // return new UserEntity(data);
   }
 
-  @Get('/profile')
-  @UseGuards(JwtAuthGuard)
-  async getProfile(@Request() req: any): Promise<any> {
-    const { user } = req;
-    const { _id } = user;
+  // @Get('/profile')
+  // @UseGuards(JwtAuthGuard)
+  // async getProfile(@Request() req: any): Promise<any> {
+  //   const { user } = req;
+  //   const { _id } = user;
 
-    // try {
-    //   const user = await this.userService.findById(_id)
-    //   const avatarUrl = await this.storageService.getPresignedUrl(user.avatar, 60 * 60 * 24)
-    //   const bannerUrl = await this.storageService.getPresignedUrl(user.banner, 60 * 60 * 24)
-    //   const data = {
-    //     ...user.toJSON(),
-    //     avatar: avatarUrl,
-    //     banner: bannerUrl
-    //   }
+  //   try {
+  //     const user = await this.userService.findById(_id)
+  //     // const avatarUrl = await this.storageService.getPresignedUrl(user.avatar, 60 * 60 * 24)
+  //     // const bannerUrl = await this.storageService.getPresignedUrl(user.banner, 60 * 60 * 24)
+  //     const data = {
+  //       ...user.toJSON(),
+  //       // avatar: avatarUrl,
+  //       // banner: bannerUrl
+  //     }
 
-    //   return new UserProfileEntity(data)
-    // } catch (error) {
-    //   console.error(error);
-    //   throw new HttpException(
-    //     {
-    //       status: HttpStatus.INTERNAL_SERVER_ERROR,
-    //       message: 'Something went wrong',
-    //     },
-    //     HttpStatus.INTERNAL_SERVER_ERROR,
-    //   );
-    // }
-  }
+  //     return new UserProfileEntity(data)
+  //   } catch (error) {
+  //     console.error(error);
+  //     throw new HttpException(
+  //       {
+  //         status: HttpStatus.INTERNAL_SERVER_ERROR,
+  //         message: 'Something went wrong',
+  //       },
+  //       HttpStatus.INTERNAL_SERVER_ERROR,
+  //     );
+  //   }
+  // }
 
   @Get('/follow/:id')
   @ApiParam({ name: 'id', required: true })
