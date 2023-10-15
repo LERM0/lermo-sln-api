@@ -30,16 +30,9 @@ import { NotificationService } from '@services/notification/notification.service
 import { NotificationController } from '@controllers/notification/notification.controller';
 import configuration from '@config/configuration';
 import databaseConfig from '@config/database.config';
+import { jwtConstants } from '@common/constants';
 
-// const JWT_PRIVATE_KEY = Buffer.from(process.env.JWT_PRIVATE_KEY, 'base64').toString('ascii')
-// const JWT_PUBLIC_KEY = Buffer.from(process.env.JWT_PUBLIC_KEY, 'base64').toString('ascii')
-const JWT_PASSPHRASE = process.env.JWT_PASSPHRASE || 'lermo'
-const JWT_ISSUER = process.env.JWT_ISSUER || 'lermo'
-const JWT_EXPIRESIN = process.env.JWT_EXPIRESIN || '30d'
-
-const DATABASE_CONNECTION = process.env.DATABASE_CONNECTION || "mongodb://localhost:27017/lermo"
 const ELASTICSEARCH_CONNECTION = process.env.ELASTICSEARCH_CONNECTION || "http://localhost:9200"
-
 
 @Module({
   imports: [
@@ -49,7 +42,8 @@ const ELASTICSEARCH_CONNECTION = process.env.ELASTICSEARCH_CONNECTION || "http:/
       imports: [ConfigModule.forRoot({ load: [databaseConfig] })],
       useFactory: async (configService: ConfigService) => {
         return {
-          uri: configService.get<string>('db.url')
+          uri: configService.get<string>('db.url'),
+          dbName: 'lermo'
         }
       },
       inject: [ConfigService],
@@ -59,9 +53,11 @@ const ELASTICSEARCH_CONNECTION = process.env.ELASTICSEARCH_CONNECTION || "http:/
     }),
     PassportModule,
     JwtModule.register({
-      publicKey: '',
-      privateKey: { key: '', passphrase: JWT_PASSPHRASE },
-      signOptions: { algorithm: "RS256", expiresIn: JWT_EXPIRESIN, issuer: JWT_ISSUER, },
+      // publicKey: '',
+      // privateKey: { key: '', passphrase: JWT_PASSPHRASE },
+      // signOptions: { algorithm: "RS256", expiresIn: JWT_EXPIRESIN, issuer: JWT_ISSUER, },
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '7d' },
     }),
     MongooseModule.forFeature([{ name: 'user', schema: UserSchema, collection: "users" }]),
     MongooseModule.forFeature([{ name: 'video', schema: VideoSchema, collection: "videos" }]),

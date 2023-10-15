@@ -9,7 +9,8 @@ import {
   UseInterceptors,
   Redirect,
   Res,
-  // Res,
+  HttpException,
+  Request,
 } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { nanoid } from 'nanoid/non-secure';
@@ -19,6 +20,8 @@ import { AuthService } from '@services/auth/auth.service';
 import { FacebookAuthGuard } from '@common/guards/facebook-auth.guard';
 import { UserService } from '@services/user/user.service';
 import { ResponseInterceptor } from '@common/interceptors/response.interceptor';
+import { JwtAuthGuard } from '@common/guards/jwt-auth.guard';
+import { UserProfileEntity } from '@entities/user.entity';
 
 const WEB_URL = process.env.WEB_URL || 'http://localhost:3000';
 
@@ -36,6 +39,36 @@ export class AuthController {
   async signin(@Body() body: SignInDTO): Promise<any> {
     const { email, password } = body;
     return this.authService.login(email, password);
+  }
+
+  @Get('/profile')
+  @UseGuards(JwtAuthGuard)
+  async getProfile(@Request() req: any): Promise<any> {
+    const { user } = req;
+    const { _id } = user;
+
+    return user;
+    try {
+      const user = await this.userService.findById(_id)
+      // const avatarUrl = await this.storageService.getPresignedUrl(user.avatar, 60 * 60 * 24)
+      // const bannerUrl = await this.storageService.getPresignedUrl(user.banner, 60 * 60 * 24)
+      const data = {
+        ...user.toJSON(),
+        // avatar: avatarUrl,
+        // banner: bannerUrl
+      }
+
+      return new UserProfileEntity(data)
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Something went wrong',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   // Disable Facebook & Google in Beta
