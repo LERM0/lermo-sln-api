@@ -82,6 +82,45 @@ export class UserController {
     return res;
   }
 
+  @Post('/register')
+  @ApiBody({ type: CreateUserDTO })
+  async register(@Body() body: CreateUserDTO): Promise<any> {
+    const { email, password } = body;
+
+    const passwordHash = await this.authService
+      .hashPassword(password)
+      .catch(err => {
+        console.error(err);
+        throw new HttpException(
+          {
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: 'Something went wrong',
+          },
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      })
+
+    const data = {
+      email,
+      username: email,
+      passwordHash,
+    }
+    const user = await this.userService.create(data).catch(() => {
+      throw new HttpException(
+        {
+          status: HttpStatus.CONFLICT,
+          message: 'Email does exists',
+        },
+        HttpStatus.CONFLICT,
+      );
+    });
+
+    return {
+      email,
+      username: user.username,
+    };
+  }
+
   @Get('/profile/:id')
   @ApiParam({ name: 'id', required: true })
   async getProfileById(@Param('id') id: string): Promise<any> {
@@ -233,24 +272,7 @@ export class UserController {
     return new UserProfileEntity(res.toJSON());
   }
 
-  @Post('/register')
-  @ApiBody({ type: CreateUserDTO })
-  async register(@Body() body: CreateUserDTO): Promise<any> {
-    const user = await this.userService.create(body).catch(() => {
-      throw new HttpException(
-        {
-          status: HttpStatus.CONFLICT,
-          message: 'Email does exists',
-        },
-        HttpStatus.CONFLICT,
-      );
-    });
-    const { email, username } = user;
-    return {
-      email,
-      username,
-    };
-  }
+  
 
   @Post('/index')
   async index() {

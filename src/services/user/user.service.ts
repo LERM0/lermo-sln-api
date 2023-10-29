@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose/dist/common/mongoose.decorators';
 import { Model } from 'mongoose';
-import { IUserModel, IUser } from '@interfaces/user.interface';
+import { IUserModel, IUser, CreateUserParams } from '@interfaces/user.interface';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 
 import { UserEntity } from '@entities/user.entity';
@@ -14,17 +14,16 @@ export class UserService {
     @InjectModel('user') private readonly userModel: Model<IUserModel>,
   ) { }
 
-  async create(document: IUser): Promise<IUserModel> {
+  async create(document: CreateUserParams): Promise<IUserModel> {
     const res = new this.userModel(document);
     return await res.save();
   }
 
-  async update(_id: string, document: IUser): Promise<IUser> {
-    const res = this.userModel.findByIdAndUpdate(_id, document)
-    return res
+  async update(_id: string, document: IUserModel): Promise<void> {
+    await this.userModel.findByIdAndUpdate(_id, document)
   }
 
-  async findOne(email: string): Promise<any> {
+  async findOne(email: string): Promise<IUserModel> {
     const res = await this.userModel.findOne({ email });
     return res;
   }
@@ -34,12 +33,7 @@ export class UserService {
     return res;
   }
 
-  async findByIds(ids: string[]): Promise<any> {
-    const res = await this.userModel.find().where('_id').in(ids)
-    return res;
-  }
-
-  async findAll(query: {}, page?: number, limit?: number): Promise<IUser[]> {
+  async findAll(query: {}, page?: number, limit?: number): Promise<IUserModel[]> {
     const res = await this.userModel
       .find(query)
       .skip(page || 0)
@@ -48,7 +42,7 @@ export class UserService {
     return res;
   }
 
-  async updateAvatar(_id: string, uri: string): Promise<any> {
+  async updateAvatar(_id: string, uri: string): Promise<IUserModel> {
     const res = await this.userModel.updateOne(
       { _id },
       {
@@ -60,7 +54,7 @@ export class UserService {
     return res
   }
 
-  async updateBanner(_id: string, uri: string): Promise<any> {
+  async updateBanner(_id: string, uri: string): Promise<IUserModel> {
     const res = await this.userModel.updateOne(
       { _id },
       {

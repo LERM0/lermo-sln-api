@@ -5,7 +5,7 @@ const SALT_WORK_FACTOR = 10;
 export interface IUser {
   email: string;
   username: string;
-  password: string;
+  passwordHash?: string;
   classrooms?: string[];
   about?: string;
   gender?: string;
@@ -16,9 +16,11 @@ export interface IUser {
 }
 
 export interface IUserModel extends Document, IUser {
-  createAt: Date;
-  updateAt: Date;
+  createAt?: Date;
+  updateAt?: Date;
 }
+
+export type CreateUserParams = Pick<IUserModel, 'email' | 'username' | 'passwordHash'>;
 
 const UserSchema = new Schema(
   {
@@ -33,7 +35,7 @@ const UserSchema = new Schema(
       required: true,
       index: true,
     },
-    password: {
+    passwordHash: {
       type: String,
       required: true,
     },
@@ -42,8 +44,6 @@ const UserSchema = new Schema(
     gender: String,
     avatar: String,
     banner: String,
-    explore: Array,
-    classrooms: Array
   },
   {
     timestamps: true,
@@ -51,22 +51,22 @@ const UserSchema = new Schema(
   },
 );
 
-UserSchema.pre<IUserModel>('save', function(next) {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this;
+// UserSchema.pre<IUserModel>('save', function(next) {
+// eslint-disable-next-line @typescript-eslint/no-this-alias
+// const user = this;
 
-  if (!user.isModified('password')) return next(null);
+// if (!user.isModified('password')) return next(null);
 
-  // generate a salt
-  bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
-    if (err) return next(err);
+// generate a salt
+// bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
+//   if (err) return next(err);
 
-    bcrypt.hash(user.password, salt, function(err, hash) {
-      if (err) return next(err);
-      user.password = hash;
-      next(null);
-    });
-  });
-});
+//   bcrypt.hash(user.passwordHash, salt, function(err, hash) {
+//     if (err) return next(err);
+//     user.passwordHash = hash;
+//     next(null);
+//   });
+// });
+// });
 
 export { UserSchema };
