@@ -12,6 +12,7 @@ import {
   HttpException,
   Request,
   HttpCode,
+  NotImplementedException,
 } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { nanoid } from 'nanoid/non-secure';
@@ -43,13 +44,7 @@ export class AuthController {
   async signin(@Body() body: SignInDTO): Promise<any> {
     const { email, password } = body;
 
-    const signOptions = {
-      expiresIn: this.configService.get('jwt.expiresIn'),
-      issuer: this.configService.get('jwt.issuer'),
-      algorithm: 'RS256',
-    }
-
-    return this.authService.login(email, password, signOptions)
+    return this.authService.login(email, password)
   }
 
   @Get('/profile')
@@ -77,20 +72,22 @@ export class AuthController {
       user: { user },
     } = req;
     const { email, firstName, lastName } = user;
-    const result = await this.userService.findOne(email);
 
-    if (!result) {
-      const payload = {
-        email,
-        username: `${firstName} ${lastName}`,
-        password: nanoid(),
-      };
-      await this.userService.create(payload);
-    }
+    throw new NotImplementedException();
+    // const result = await this.userService.findOne(email);
 
-    const auth = await this.authService.ssoLogin(email);
-    const { access_token } = auth;
-    res.redirect(`${WEB_URL}/oauth/callback?token=${access_token}`);
+    // if (!result) {
+    //   const payload = {
+    //     email,
+    //     username: `${firstName} ${lastName}`,
+    //     password: nanoid(),
+    //   };
+    //   await this.userService.create(payload);
+    // }
+
+    // const auth = await this.authService.ssoLogin(email);
+    // const { access_token } = auth;
+    // res.redirect(`${WEB_URL}/oauth/callback?token=${access_token}`);
   }
 
   // @Get('/google')
